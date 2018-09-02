@@ -10,7 +10,7 @@ class ConfigParams(object):
         config.read_file(open(file))
 
         # Vocabulary
-        self.vocab_threshold = config.get(Const.ConfigSection.vocabulary, "vocab_threshold")
+        self.vocab_threshold = config.getint(Const.ConfigSection.vocabulary, "vocab_threshold")
 
         # Model
         self.architecture = config.get(Const.ConfigSection.model, "architecture")

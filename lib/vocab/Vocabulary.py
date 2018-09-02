@@ -30,6 +30,7 @@ class Vocabulary(object):
         self.word2idx = {}
         self.idx2word = {}
         self.idx = 0
+        self.built = False
         self.get_vocab()
 
     def get_vocab(self):
@@ -39,7 +40,8 @@ class Vocabulary(object):
                 vocab = pickle.load(f)
                 self.word2idx = vocab.word2idx
                 self.idx2word = vocab.idx2word
-            print('Vocabulary successfully loaded from vocab.pkl file!')
+                self.built = True
+            print('Vocabulary successfully loaded from ' + self.vocab_file)
         else:
             self.init_vocab()
 
@@ -57,6 +59,10 @@ class Vocabulary(object):
 
         with open(self.vocab_file, 'wb') as f:
             pickle.dump(self, f)
+
+        print("Saved vocabulary in " + self.vocab_file)
+
+        self.built = True
 
     def add_word(self, word):
         """Add a token to the vocabulary."""
