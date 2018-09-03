@@ -16,6 +16,9 @@ class ConfigParams(object):
         self.architecture = config.get(Const.ConfigSection.model, "architecture")
         self.input_size = config.getint(Const.ConfigSection.model, "input_size", fallback=224)
         self.input_channels = config.getint(Const.ConfigSection.model, "input_channels", fallback=3)
+        self.embed_size = config.getint(Const.ConfigSection.model, "embed_size")
+        self.hidden_size = config.getint(Const.ConfigSection.model, "hidden_size")
+        self.lstm_layers = config.getint(Const.ConfigSection.model, "lstm_layers")
         self.preprocess_type = config.get(Const.ConfigSection.model, "preprocess_type", fallback="pytorch_default")
 
         # HyperParameters

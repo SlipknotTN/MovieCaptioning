@@ -9,7 +9,6 @@ class ModelsFactory(object):
 
         if config.architecture == "sqnet":
 
-            #return SqNet(num_classes)
             raise NotImplementedError
 
         if config.architecture == "resnet50":
