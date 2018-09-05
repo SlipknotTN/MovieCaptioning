@@ -18,7 +18,7 @@ def do_parsing():
                                      description="PyTorch training script")
     parser.add_argument("--dataset_dir", required=True, type=str, help="Dataset root directory")
     parser.add_argument("--config_file", required=True, type=str, help="Config file path")
-    parser.add_argument("--model_output_dir", required=False, type=str, default="./export/model.pth",
+    parser.add_argument("--model_output_dir", required=False, type=str, default="./export/model",
                         help="Directory where to save PyTorch models")
     parser.add_argument("--vocab_file", required=True, type=str, help="Vocabulary pickle file")
     parser.add_argument("--data_source", required=False, type=str, default="coco", help="Vocabulary and images source")
@@ -79,7 +79,7 @@ def main():
 
     total_step = len(dataset_train) // config.batch_size
 
-    for epoch in range(config.epochs):
+    for epoch in range(1, config.epochs + 1):
 
         # Iterate on train batches and update weights using loss
         for i_step in range(1, total_step + 1):
@@ -98,7 +98,11 @@ def main():
             captions = captions.type(torch.cuda.LongTensor)
             images = images.type(torch.cuda.FloatTensor)
 
-            # Forward pass the inputs through the CNN-RNN model.
+            # Zero the gradients
+            dec.zero_grad()
+            enc.zero_grad()
+
+            # Forward pass the inputs through the CNN-RNN model
             features = enc(images)
             outputs = dec(features, captions)
 
@@ -124,7 +128,7 @@ def main():
         # TODO: Iterate on validation batches
         # print("Calculating validation accuracy...")
 
-        torch.save(dec.state_dict(), os.path.join(args.model_ouput_dir, 'decoder-%d.pkl' % epoch))
+        torch.save(dec.state_dict(), os.path.join(args.model_output_dir, 'decoder-%d.pkl' % epoch))
         torch.save(enc.state_dict(), os.path.join(args.model_output_dir, 'encoder-%d.pkl' % epoch))
 
     print("End")
