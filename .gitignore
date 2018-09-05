@@ -1,4 +1,5 @@
 .idea
 *.pyc
 export
-vocab
+*.pkl
+tmdb_apikey

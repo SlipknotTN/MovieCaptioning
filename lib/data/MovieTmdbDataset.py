@@ -1,13 +1,13 @@
 import os
+import json
 import numpy as np
 import torch
 from torch.utils.data import Dataset
 from PIL import Image
-from pycocotools.coco import COCO
 import nltk
 
 
-class CocoDataset(Dataset):
+class MovieTmdbDataset(Dataset):
 
     def __init__(self, dataset_dir, vocabulary, transform):
 
@@ -17,11 +17,13 @@ class CocoDataset(Dataset):
         self.captions_lengths = []
         self.transform = transform
 
-        self.coco_train = COCO(os.path.join(dataset_dir, "annotations", "captions_train2014.json"))
-        ids = self.coco_train.anns.keys()
-        for i, id in enumerate(ids):
-            caption = str(self.coco_train.anns[id]['caption'])
-            image_id = int(self.coco_train.anns[id]["image_id"])
+        # TODO: Create Captions train and val named captions_train and captions_val
+        with open(os.path.join(dataset_dir, "annotations", "full_captions.json"), "r") as captions_file:
+            metadata = json.loads(captions_file.readlines()[0])
+
+        for i, single_metadata in enumerate(metadata):
+            caption = single_metadata['title']
+            image_id = single_metadata["movie_id"]
             tokens = nltk.tokenize.word_tokenize(caption.lower())
             tokens_ids = [self.vocab(self.vocab.start_word)]
             for token in tokens:
@@ -34,7 +36,7 @@ class CocoDataset(Dataset):
             self.samples.append((image_id, tokens_ids))
 
             if i % 100000 == 0:
-                print("[%d/%d] Preparing image_id and captions..." % (i, len(ids)))
+                print("[%d/%d] Preparing image_id and captions..." % (i, len(metadata)))
 
     def __len__(self):
 
@@ -45,10 +47,10 @@ class CocoDataset(Dataset):
         image_id = self.samples[idx][0]
         captions_ids = self.samples[idx][1]
 
-        image_path = self.coco_train.loadImgs(image_id)[0]['file_name']
+        image_path = str(image_id) + ".jpg"
 
         # Convert image to tensor and pre-process using transform
-        image = Image.open(os.path.join(self.dataset_dir, "images", "train2014", image_path)).convert('RGB')
+        image = Image.open(os.path.join(self.dataset_dir, "images", image_path)).convert('RGB')
         image = self.transform(image)
 
         # Convert to tensor

@@ -4,17 +4,12 @@ import os
 
 class Vocabulary(object):
 
-    def __init__(self,
-                 vocab_threshold,
-                 vocab_file,
-                 start_word="<start>",
-                 end_word="<end>",
-                 unk_word="<unk>",
+    def __init__(self, vocab_file, vocab_threshold=0, start_word="<start>", end_word="<end>", unk_word="<unk>",
                  force_rebuild=False):
         """
         Initialize the vocabulary.
-        :param vocab_threshold: Minimum word count threshold.
         :param vocab_file: File containing the vocabulary.
+        :param vocab_threshold: Minimum word count threshold.
         :param start_word: Special word denoting sentence start.
         :param end_word: Special word denoting sentence end.
         :param unk_word: Special word denoting unknown words.

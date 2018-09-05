@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torchvision.models as models
+import torch.nn.functional as F
 
 
 class ResNetEncoderCNN(nn.Module):
@@ -94,9 +95,41 @@ class ResNetDecoderRNN(nn.Module):
         :param inputs:
         :param states:
         :param max_len:
-        :return:
+        :return: python list of predicted caption with word indexes
         """
-        pass
+        # Shape of encoded image (inputs): batch_size(1) x captions_length (1, feature_length) x embed_size
+        # print(inputs.shape)
+
+        # TODO: Support batch_size > 1
+
+        sentence = []
+
+        for index in range(max_len):
+
+            if index == 0:
+
+                # We pass the input through the model and obtain the word prediction
+                lstm_out, (h, c) = self.lstm(inputs)
+
+            else:
+
+                # We pass the latest word_id as input and we reuse the state
+                # print("WordId shape: " + str(word_id.shape))
+                # Reshape word input tensor to batch_size (1) x feature_length (1)
+                word_id_input = torch.reshape(word_id, (1, 1))
+                # print("WordId input shape: " + str(word_id_input.shape))
+                word_embed = self.embedding(word_id_input)
+                lstm_out, (h, c) = self.lstm(word_embed, (h, c))
+
+            fc_out = self.fc(lstm_out)
+
+            probs = F.softmax(fc_out, dim=-1)
+            probs = probs.view(probs.size(2))
+
+            word_id = torch.argmax(probs)
+            sentence.append(int(word_id))
+
+        return sentence
 
     def init_weights(self):
         """

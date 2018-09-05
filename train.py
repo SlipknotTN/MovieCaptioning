@@ -37,8 +37,11 @@ def main():
     # Load config file with model, hyperparameters and preprocessing
     config = ConfigParams(args.config_file)
 
+    os.makedirs(args.model_output_dir, exist_ok=False)
+
     # Prepare captions vocabulary
-    vocab = Vocabulary(config.vocab_threshold, vocab_file=args.vocab_file, force_rebuild=args.force_rebuild_vocab)
+    vocab = Vocabulary(vocab_file=args.vocab_file, vocab_threshold=config.vocab_threshold,
+                       force_rebuild=args.force_rebuild_vocab)
     if vocab.built is False:
         VocabularyBuilder.build(vocab, dataset_dir=args.dataset_dir, source=args.data_source)
 
